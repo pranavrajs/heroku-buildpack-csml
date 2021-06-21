@@ -107,7 +107,7 @@ BUILD_PATH=""
 # export CARGO_TARGET_DIR="$CACHE_DIR/target"
 
 
-echo "-----> Get and run"
+echo "-----> Get bin"
 cd "$BUILD_DIR/$BUILD_PATH"
 
 curl -L https://github.com/CSML-by-Clevy/csml-engine/releases/download/v1.6.3/csml-server-linux-amd64 > csml-server
@@ -115,8 +115,6 @@ curl -L https://github.com/CSML-by-Clevy/csml-engine/releases/download/v1.6.3/cs
 echo "-----> Set permissions"
 chmod 777 csml-server
 
-echo "-----> Run server"
-./csml-server
 
 
 #   rm -rf target/
