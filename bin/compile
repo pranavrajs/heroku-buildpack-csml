@@ -16,95 +16,95 @@ VERSION=stable
 # `BUILD_PATH` to the correct directory in the `RustConfig`
 BUILD_PATH=""
 
-# Load our toolchain configuration, if any was specified.
-if [ -f "$BUILD_DIR/rust-toolchain" ]; then
-    VERSION="$(cat "$BUILD_DIR/rust-toolchain")"
-fi
+# # Load our toolchain configuration, if any was specified.
+# if [ -f "$BUILD_DIR/rust-toolchain" ]; then
+#     VERSION="$(cat "$BUILD_DIR/rust-toolchain")"
+# fi
 
-# Load our configuration variables, if any were specified.
-if [ -f "$BUILD_DIR/RustConfig" ]; then
-    . "$BUILD_DIR/RustConfig"
-fi
+# # Load our configuration variables, if any were specified.
+# if [ -f "$BUILD_DIR/RustConfig" ]; then
+#     . "$BUILD_DIR/RustConfig"
+# fi
 
-# Standard paranoia.
-set -eu
+# # Standard paranoia.
+# set -eu
 
-# Check our configuration options.
-if [ -z ${VERSION+x} ]; then
-  >&2 echo "failed: must set VERSION with rust-toolchain or RustConfig to indicate the Rust version."
-  exit 1
-fi
+# # Check our configuration options.
+# if [ -z ${VERSION+x} ]; then
+#   >&2 echo "failed: must set VERSION with rust-toolchain or RustConfig to indicate the Rust version."
+#   exit 1
+# fi
 
-# Notify users running old, unstable versions of Rust about how to deploy
-# successfully.
-if ( [ ! -z ${CARGO_URL+x} ] || [ ! -f "$BUILD_DIR/$BUILD_PATH/Cargo.toml" ] ); then
-    >&2 cat <<EOF
-To deploy a modern Rust app, make sure you have a Cargo.toml file, and that
-you do not define CARGO_URL or CARGO_VERSION in RustConfig.  If you're
-using an older version of Rust, and you need to re-deploy an existing
-application, try setting your buildpack to:
+# # Notify users running old, unstable versions of Rust about how to deploy
+# # successfully.
+# if ( [ ! -z ${CARGO_URL+x} ] || [ ! -f "$BUILD_DIR/$BUILD_PATH/Cargo.toml" ] ); then
+#     >&2 cat <<EOF
+# To deploy a modern Rust app, make sure you have a Cargo.toml file, and that
+# you do not define CARGO_URL or CARGO_VERSION in RustConfig.  If you're
+# using an older version of Rust, and you need to re-deploy an existing
+# application, try setting your buildpack to:
 
-  https://github.com/emk/heroku-buildpack-rust.git#old-rust
-EOF
-    exit 1
-fi
+#   https://github.com/emk/heroku-buildpack-rust.git#old-rust
+# EOF
+#     exit 1
+# fi
 
-# Handle people who still aren't using Rustup.
-if [ ! -z ${URL+x} ]; then
-    >&2 cat <<EOF
-heroku-pack-rust has switched to using rustup.  You no longer need a
-URL field in RustConfig. Instead, you should just specify a
-rustup-compatible version (such as `1.11`, `stable` or `nighty`) in VERSION.
-EOF
-    exit 1
-fi
+# # Handle people who still aren't using Rustup.
+# if [ ! -z ${URL+x} ]; then
+#     >&2 cat <<EOF
+# heroku-pack-rust has switched to using rustup.  You no longer need a
+# URL field in RustConfig. Instead, you should just specify a
+# rustup-compatible version (such as `1.11`, `stable` or `nighty`) in VERSION.
+# EOF
+#     exit 1
+# fi
 
-# Record our Rust build environment configuration in an export file, in
-# case another buildpack needs it to build Ruby gems that use Rust or
-# something like that.
-cat <<EOF > $BP_DIR/export
-# Our rustup installation.
-export RUSTUP_HOME="$CACHE_DIR/multirust"
+# # Record our Rust build environment configuration in an export file, in
+# # case another buildpack needs it to build Ruby gems that use Rust or
+# # something like that.
+# cat <<EOF > $BP_DIR/export
+# # Our rustup installation.
+# export RUSTUP_HOME="$CACHE_DIR/multirust"
 
-# Our cargo installation.  We implicitly trust Rustup and Cargo
-# to do the right thing when new versions are released.
-export CARGO_HOME="$CACHE_DIR/cargo"
+# # Our cargo installation.  We implicitly trust Rustup and Cargo
+# # to do the right thing when new versions are released.
+# export CARGO_HOME="$CACHE_DIR/cargo"
 
-# Include binaries installed by cargo and rustup in our path.
-PATH="\$CARGO_HOME/bin:\$PATH"
-EOF
+# # Include binaries installed by cargo and rustup in our path.
+# PATH="\$CARGO_HOME/bin:\$PATH"
+# EOF
 
-# Read our build environment back in and evaluate it so that we can use it.
-. $BP_DIR/export
+# # Read our build environment back in and evaluate it so that we can use it.
+# . $BP_DIR/export
 
-# Switch to our cache directory.
-mkdir -p "$CACHE_DIR"
-cd "$CACHE_DIR"
+# # Switch to our cache directory.
+# mkdir -p "$CACHE_DIR"
+# cd "$CACHE_DIR"
 
-# Make sure we have an appropriate Rust toolchain installed.
-if [ -d "$CARGO_HOME" ]; then
-    echo "-----> Checking for new releases of Rust $VERSION channel"
-    # It's possible that $VERSION has changed, or the `stable` channel has updated.
-    rustup self update
-    rustup update "$VERSION"
-    rustup default "$VERSION"
-else
-    echo "-----> Downloading rustup"
-    curl https://sh.rustup.rs -sSf > rustup.sh
-    chmod u+x rustup.sh
-    echo "-----> Using rustup to install Rust channel $VERSION"
-    ./rustup.sh -y --default-toolchain "$VERSION"
-    rm rustup.sh
-fi
-if [ ! -x "$CARGO_HOME/bin/rustc" ]; then
-  echo "failed: Cannot find Rust binaries at $CARGO_HOME"
-  exit 1
-fi
+# # Make sure we have an appropriate Rust toolchain installed.
+# if [ -d "$CARGO_HOME" ]; then
+#     echo "-----> Checking for new releases of Rust $VERSION channel"
+#     # It's possible that $VERSION has changed, or the `stable` channel has updated.
+#     rustup self update
+#     rustup update "$VERSION"
+#     rustup default "$VERSION"
+# else
+#     echo "-----> Downloading rustup"
+#     curl https://sh.rustup.rs -sSf > rustup.sh
+#     chmod u+x rustup.sh
+#     echo "-----> Using rustup to install Rust channel $VERSION"
+#     ./rustup.sh -y --default-toolchain "$VERSION"
+#     rm rustup.sh
+# fi
+# if [ ! -x "$CARGO_HOME/bin/rustc" ]; then
+#   echo "failed: Cannot find Rust binaries at $CARGO_HOME"
+#   exit 1
+# fi
 
 # This is where we will cache our Rust output.  Note the suggestions at
 # https://github.com/alexcrichton/cargo/commit/014765f788ca1c2476936835ca32cc2746f99b42
 # which describe how this needs to be named.
-export CARGO_TARGET_DIR="$CACHE_DIR/target"
+# export CARGO_TARGET_DIR="$CACHE_DIR/target"
 
 
 echo "-----> Get and run"
@@ -112,7 +112,11 @@ cd "$BUILD_DIR/$BUILD_PATH"
 
 curl -L https://github.com/CSML-by-Clevy/csml-engine/releases/download/v1.6.3/csml-server-linux-amd64 > csml-server
 
+echo "-----> Set permissions"
 chmod 777 csml-server
+
+echo "-----> Run server"
+./csml-server
 
 
 #   rm -rf target/
