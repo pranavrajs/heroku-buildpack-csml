@@ -110,12 +110,10 @@ export CARGO_TARGET_DIR="$CACHE_DIR/target"
 echo "-----> Get and run"
 cd "$BUILD_DIR/$BUILD_PATH"
 
-curl -L https://github.com/CSML-by-Clevy/csml-engine/releases/download/v1.6.3/csml-server-macos-amd64 > csml-server-macos-amd64
+curl -L https://github.com/CSML-by-Clevy/csml-engine/releases/download/v1.6.3/csml-server-linux-amd64 > csml-server
 
-chmod 777 csml-server-macos-amd64
+chmod 777 csml-server
 
-echo "-----> run server"
-./csml-server-macos-amd64
 
 #   rm -rf target/
 #   cargo build $RUST_CARGO_BUILD_FLAGS
