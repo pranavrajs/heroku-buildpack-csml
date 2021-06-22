@@ -19,7 +19,8 @@ BUILD_PATH=""
 echo "-----> Get bin"
 cd "$BUILD_DIR/$BUILD_PATH"
 
-curl -L https://github.com/CSML-by-Clevy/csml-engine/releases/download/v1.6.3/csml-server-linux-amd64 > csml-server
+DOWNLOAD_URL=$(curl https://api.github.com/repos/CSML-by-Clevy/csml-engine/releases/latest | grep browser_download_url | grep csml-server-linux-amd64 | cut -d '"' -f 4)
+curl -L "$DOWNLOAD_URL" > csml_server
 
 echo "-----> Set permissions"
 chmod 755 csml-server
