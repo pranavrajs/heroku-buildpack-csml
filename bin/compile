@@ -16,11 +16,12 @@ VERSION=stable
 # `BUILD_PATH` to the correct directory in the `RustConfig`
 BUILD_PATH=""
 
-echo "-----> Get bin"
+echo "-----> Get DOWNLOAD_URL"
 cd "$BUILD_DIR/$BUILD_PATH"
 
 DOWNLOAD_URL=$(curl https://api.github.com/repos/CSML-by-Clevy/csml-engine/releases/latest | grep browser_download_url | grep csml-server-linux-amd64 | cut -d '"' -f 4)
-curl -L "$DOWNLOAD_URL" > csml_server
+echo "-----> Get bin"
+curl -L "$DOWNLOAD_URL" > csml-server-linux-amd64
 
 echo "-----> Set permissions"
-chmod 755 csml-server
+chmod 755 csml-server-linux-amd64
