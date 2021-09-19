@@ -19,7 +19,7 @@ BUILD_PATH=""
 echo "-----> Get DOWNLOAD_URL"
 cd "$BUILD_DIR/$BUILD_PATH"
 
-DOWNLOAD_URL=$(curl https://api.github.com/repos/CSML-by-Clevy/csml-engine/releases/latest | grep browser_download_url | grep csml-server-linux-amd64 | cut -d '"' -f 4)
+DOWNLOAD_URL="https://github.com/CSML-by-Clevy/csml-engine/releases/download/v1.7.0-beta3/csml-server-linux-amd64"
 echo "-----> Get bin"
 curl -L "$DOWNLOAD_URL" > csml-server-linux-amd64
 
